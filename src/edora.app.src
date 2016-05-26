@@ -1,0 +1,10 @@
+{application, 'edora',
+  [{description, "Library to manage Erlang cluster"},
+    {vsn, "0.1.0"},
+    {registered, []},
+    {env,[]},
+    {modules, []},
+    {contributors, []},
+    {licenses, []},
+    {links, []}
+  ]}.
