@@ -1,10 +1,13 @@
 {application, 'edora',
-  [{description, "Library to manage Erlang cluster"},
+  [{description, "Application for Erlang cluster's managing"},
     {vsn, "0.1.0"},
     {registered, []},
     {env,[]},
     {modules, []},
     {contributors, []},
     {licenses, []},
-    {links, []}
+    {links, []},
+    {applications, [kernel
+      , stdlib]},
+    {mod, {edora, []}}
   ]}.

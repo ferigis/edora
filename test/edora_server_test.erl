@@ -21,6 +21,7 @@
 %%%===================================================================
 
 start_link() ->
+  edora:start(),
   gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 
 join(ClusterName) ->
