@@ -1,9 +1,15 @@
 %%%-------------------------------------------------------------------
 %%% @doc
 %%% This is the main module, which contains all API functions.
+%%% It also implements the application behaviour.
 %%% @end
-%%%-------------------------------------------------------l------------
+%%%-------------------------------------------------------------------
 -module(edora).
+-behaviour(application).
+
+%% Application callbacks
+-export([start/0, start/2]).
+-export([stop/0, stop/1]).
 
 %% API
 -export([join/1]).
@@ -15,6 +21,32 @@
 %% Types
 -type cluster_name() :: atom().
 -type virtual_cluster_name() :: atom().
+
+%%%===================================================================
+%%% Application callbacks
+%%%===================================================================
+
+%% @hidden
+-spec(start(StartType :: normal | {takeover, node()} | {failover, node()},
+    StartArgs :: term()) ->
+  {ok, pid()} |
+  {error, Reason :: term()}).
+start(_StartType, _StartArgs) ->
+  {ok, SupPid} = edora_sup:start_link(),
+  {ok, SupPid}.
+
+%% @hidden
+-spec(stop(pid()) -> term()).
+stop(_Pid) ->
+  ok.
+
+%% @doc Starts `edora' application.
+-spec start() -> {ok, _} | {error, term()}.
+start() -> application:ensure_all_started(edora).
+
+%% @doc Stops `edora' application.
+-spec stop() -> ok | {error, term()}.
+stop() -> application:stop(edora).
 
 %%%===================================================================
 %%% edora API
@@ -61,18 +93,16 @@ vcluster_name(Name) when is_atom(Name) ->
   binary_to_atom(Bin, utf8).
 
 
-%% Internal functions
+%%%===================================================================
+%%% Internal functions
+%%%===================================================================
 
 %% @private
 -spec(join_(cluster_name()) -> ok).
 join_(Name) ->
   VClusterName = vcluster_name(Name),
-  case pg2:join(VClusterName, self()) of
-    {error,{no_such_group, VClusterName}} ->
-      pg2:create(VClusterName),
-      pg2:join(VClusterName, self());
-    ok -> ok
-  end.
+  edora_server:join(VClusterName),
+  ok.
 
 %% @private
 -spec nodes_from_pids({error, {no_such_group, virtual_cluster_name()}}) -> no_virtual_cluster;

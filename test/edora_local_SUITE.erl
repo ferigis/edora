@@ -24,9 +24,11 @@ all() ->
     delete_vcluster].
 
 init_per_suite(Config) ->
+  edora:start(),
   Config.
 
 end_per_suite(Config) ->
+  edora:stop(),
   Config.
 
 %%%===================================================================
@@ -40,7 +42,7 @@ create_vcluster(_Config) ->
   ok = edora:join(ClusterName),
   true = lists:member(EdoraClusterName, pg2:which_groups()),
   [Pid] = pg2:get_members(EdoraClusterName),
-  Pid = self(),
+  Pid = whereis(edora_server),
   already_joined = edora:join(ClusterName).
 
 join_vcluster(_Config) ->

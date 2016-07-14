@@ -28,14 +28,19 @@
 %%%===================================================================
 
 all() ->
-  [join_vcluster, leave_vcluster, delete_vcluster].
+  [join_vcluster
+    , leave_vcluster
+    , delete_vcluster
+  ].
 
 init_per_suite(Config) ->
+  edora:start(),
   Nodes = [Node || {ok, Node} <- [start_node(NodeShortName) || NodeShortName <- ?NODES]],
   [net_kernel:connect_node(Node) || Node <- Nodes],
   Config.
 
 end_per_suite(Config) ->
+  edora:stop(),
   [stop_node(NodeShortName) || NodeShortName <- ?NODES],
   Config.
 
